@@ -1,0 +1,9 @@
+// Cloudflare deploy config: the site is fully static, so Cloudflare just serves
+// the built dist/ folder (npm run build makes it). /os/ maps to dist/os/index.html.
+{
+  "name": "portfolio-app",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist"
+  }
+}
