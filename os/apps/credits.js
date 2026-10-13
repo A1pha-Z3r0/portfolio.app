@@ -14,8 +14,8 @@ const HTML = `
       <small>
         This site is adapted from his
         ${link('https://github.com/henryjeff/portfolio-website', 'portfolio-website')} (MIT License)
-        and ${link('https://github.com/henryjeff/portfolio-inner-site', 'portfolio-inner-site')}
-        (used with his permission). The CSS3D + WebGL "hole punch" technique, the screen
+        and ${link('https://github.com/henryjeff/portfolio-inner-site', 'portfolio-inner-site')}.
+         The CSS3D + WebGL "hole punch" technique, the screen
         layers, the camera ideas and the window-manager behaviour all come from his work.
       </small>
     </dd>
