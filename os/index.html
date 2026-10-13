@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/favicon.svg" />
+    <title>JONATHAN OS</title>
+    <!-- The OS only exists inside the 3D monitor: opened on its own, go to the 3D scene. -->
+    <script>
+      if (window.parent === window) location.replace('/')
+    </script>
+    <link rel="stylesheet" href="./os.css" />
+  </head>
+  <body>
+    <div id="os">
+      <div id="boot" aria-live="polite">
+        <pre id="boot-text"></pre>
+      </div>
+
+      <div id="desktop" hidden>
+        <nav id="icons" aria-label="Desktop"></nav>
+        <div id="windows"></div>
+        <div id="start-menu" hidden></div>
+        <footer id="taskbar">
+          <button id="start" aria-haspopup="menu" aria-expanded="false">J·OS</button>
+          <div id="tasks"></div>
+          <time id="clock"></time>
+        </footer>
+      </div>
+
+      <!-- CRT overlay: purely visual, never catches clicks -->
+      <div class="crt" aria-hidden="true"></div>
+    </div>
+    <script type="module" src="./os.js"></script>
+  </body>
+</html>

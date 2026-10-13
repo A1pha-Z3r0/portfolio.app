@@ -1,0 +1,736 @@
+/* JONATHAN OS: a classic late-90s desktop on an old-school blue screen
+   (desktop gradient after the C64 Maxi menu screen). */
+
+@font-face {
+  font-family: 'VT323';
+  src: url('./fonts/VT323-Regular.ttf') format('truetype');
+  font-display: block;
+}
+
+:root {
+  /* Desktop + boot */
+  --desk-top: #6db6f2;
+  --desk-bottom: #1d5bbf;
+  --boot-bg: #10245e;
+  --boot-text: #9cc4ff;
+  /* Classic 3D "face" grey and its bevel shades */
+  --face: #d4d0c8;
+  --bevel-light: #ffffff;
+  --bevel-shadow: #808080;
+  --bevel-dark: #404040;
+  /* Windows */
+  --title: #0a246a;
+  --title-end: #3a6ea5;
+  --title-inactive: #808080;
+  --title-inactive-end: #b5b5b5;
+  --paper: #f5f3ee; /* window body: neutral, so photos look right */
+  --text: #1b1b1b;
+  --accent: #0a246a;
+  --link: #0b4fc4;
+  /* Game colors */
+  --black: #000000;
+  --white: #ffffff;
+  --yellow: #e8d67a;
+  --red: #b3261e;
+  --green: #2e7d32;
+  --taskbar: 40px;
+  font-family: 'VT323', ui-monospace, monospace;
+  font-size: 22px;
+  line-height: 1.15;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--desk-bottom);
+  color: var(--text);
+  user-select: none;
+  -webkit-font-smoothing: none;
+}
+
+[hidden] { display: none !important; }
+
+button, input { font: inherit; color: inherit; }
+a { color: var(--link); }
+a:hover { color: var(--title); }
+::selection { background: var(--title); color: var(--white); }
+
+#os {
+  position: absolute;
+  inset: 0;
+}
+
+#boot, #desktop {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+#desktop { background: linear-gradient(to bottom, var(--desk-top), var(--desk-bottom)); }
+
+/* ---------- boot ---------- */
+#boot { padding: 16px 20px; cursor: pointer; background: var(--boot-bg); }
+#boot-text {
+  font: inherit;
+  color: var(--boot-text);
+  white-space: pre-wrap;
+  text-shadow: 0 0 3px rgba(156, 196, 255, 0.5); /* phosphor glow */
+}
+#boot-text::after {
+  content: '';
+  display: inline-block;
+  width: 0.55em;
+  height: 0.95em;
+  vertical-align: -0.1em;
+  background: var(--boot-text);
+  animation: blink 0.8s steps(1) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ---------- desktop icons ---------- */
+#icons {
+  position: absolute;
+  top: 18px;
+  left: 8px; /* puts the widest label ("Word Game") in line with the J·OS button */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 0;
+}
+.icon {
+  width: 104px;
+  padding: 6px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: 1px dotted transparent;
+  cursor: pointer;
+  text-align: center;
+  line-height: 1;
+}
+.icon svg { width: 44px; height: 44px; image-rendering: pixelated; }
+.icon span { padding: 1px 4px; color: var(--white); font-size: 20px; text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.6); }
+.icon.selected { border-color: var(--white); }
+.icon.selected span { background: var(--title); text-shadow: none; }
+.icon:focus-visible { outline: 2px solid var(--white); }
+
+/* ---------- windows ---------- */
+/* 3D edges the classic way: raised = light top-left, dark bottom-right; sunken = the reverse. */
+#windows { position: absolute; inset: 0 0 var(--taskbar) 0; pointer-events: none; }
+
+.window {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  padding: 3px;
+  background: var(--face);
+  border: 2px solid;
+  border-color: var(--bevel-light) var(--bevel-dark) var(--bevel-dark) var(--bevel-light);
+  box-shadow: inset -1px -1px 0 var(--bevel-shadow), 4px 4px 0 rgba(0, 0, 0, 0.3);
+  pointer-events: auto;
+}
+.window.minimized { display: none; }
+/* Maximized: fills the desktop above the taskbar, frame and title bar included.
+   !important beats the inline position/size, which are kept for restoring. */
+.window.maximized { left: 0 !important; top: 0 !important; width: 100% !important; height: 100% !important; box-shadow: none; }
+.window.maximized .titlebar { cursor: default; }
+
+.titlebar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 3px 0 8px;
+  background: linear-gradient(to right, var(--title), var(--title-end));
+  color: var(--white);
+  cursor: move;
+  touch-action: none; /* let pointer events drive dragging on touch screens */
+}
+.window:not(.active) .titlebar {
+  background: linear-gradient(to right, var(--title-inactive), var(--title-inactive-end));
+  color: var(--face);
+}
+.titlebar .title { flex: 1; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.win-btn {
+  width: 22px;
+  height: 20px;
+  line-height: 14px;
+  background: var(--face);
+  color: var(--black);
+  border: 2px solid;
+  border-color: var(--bevel-light) var(--bevel-dark) var(--bevel-dark) var(--bevel-light);
+  cursor: pointer;
+}
+.win-btn:active { border-color: var(--bevel-dark) var(--bevel-light) var(--bevel-light) var(--bevel-dark); }
+/* Maximize: a little window drawn in CSS (thick top edge = its title bar). */
+.win-btn[data-action="maximize"]::before {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 9px;
+  margin: auto;
+  border: 1px solid currentColor;
+  border-top-width: 3px;
+}
+/* Restore: the same box, smaller, once the window is maximized. */
+.window.maximized .win-btn[data-action="maximize"]::before { width: 8px; height: 7px; }
+
+/* The content area is a sunken white-ish "paper" panel inside the grey frame. */
+.window-body {
+  position: relative;
+  flex: 1;
+  overflow: auto;
+  margin-top: 3px;
+  padding: 14px 16px;
+  background: var(--paper);
+  border: 2px solid;
+  border-color: var(--bevel-shadow) var(--bevel-light) var(--bevel-light) var(--bevel-shadow);
+  user-select: text;
+}
+
+/* ---------- taskbar ---------- */
+#taskbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--taskbar);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  /* Keeps J·OS and the clock clear of the screen's rounded corners
+     (about 24 px across, see makeInnerShadowTexture in src/world/Screen.js). */
+  padding: 0 20px;
+  background: var(--face);
+  border-top: 2px solid var(--bevel-light);
+  color: var(--black);
+  z-index: 100000;
+}
+#taskbar button {
+  height: 28px;
+  padding: 0 10px;
+  background: var(--face);
+  border: 2px solid;
+  border-color: var(--bevel-light) var(--bevel-dark) var(--bevel-dark) var(--bevel-light);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* The focused window's button looks pressed in. */
+#taskbar button.active {
+  background: #e8e6e1;
+  border-color: var(--bevel-dark) var(--bevel-light) var(--bevel-light) var(--bevel-dark);
+}
+#taskbar button.minimized { color: #555; }
+#start { font-weight: bold; letter-spacing: 1px; }
+#tasks { flex: 1; display: flex; gap: 6px; min-width: 0; }
+#tasks button { max-width: 180px; min-width: 0; }
+#clock {
+  padding: 2px 10px;
+  letter-spacing: 1px;
+  border: 2px solid;
+  border-color: var(--bevel-shadow) var(--bevel-light) var(--bevel-light) var(--bevel-shadow);
+}
+
+#start-menu {
+  position: absolute;
+  left: 20px;
+  bottom: calc(var(--taskbar) + 2px);
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  padding: 3px;
+  background: var(--face);
+  border: 2px solid;
+  border-color: var(--bevel-light) var(--bevel-dark) var(--bevel-dark) var(--bevel-light);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
+  z-index: 100001;
+}
+#start-menu button {
+  padding: 6px 12px;
+  text-align: left;
+  background: none;
+  border: 0;
+  color: var(--black);
+  cursor: pointer;
+}
+#start-menu button:hover, #start-menu button:focus-visible { background: var(--title); color: var(--white); outline: none; }
+#start-menu hr { border: 0; border-top: 1px solid var(--bevel-shadow); border-bottom: 1px solid var(--bevel-light); margin: 4px 0; }
+
+/* ---------- shared bits for apps ---------- */
+.btn {
+  padding: 2px 14px;
+  background: var(--face);
+  color: var(--black);
+  border: 2px solid;
+  border-color: var(--bevel-light) var(--bevel-dark) var(--bevel-dark) var(--bevel-light);
+  box-shadow: inset -1px -1px 0 var(--bevel-shadow);
+  cursor: pointer;
+}
+.btn:hover { background: #e0ddd6; }
+.btn:active { border-color: var(--bevel-dark) var(--bevel-light) var(--bevel-light) var(--bevel-dark); box-shadow: inset 1px 1px 0 var(--bevel-shadow); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.window-body h1 { font-size: 36px; font-weight: normal; color: var(--black); margin-bottom: 6px; }
+.window-body h2 { font-size: 26px; font-weight: normal; color: var(--accent); margin: 14px 0 4px; }
+.window-body p { margin-bottom: 10px; }
+.window-body ul { margin: 0 0 10px 22px; }
+.window-body img { max-width: 100%; height: auto; border: 2px solid var(--bevel-shadow); }
+.muted { color: #5c5c5c; }
+.tag {
+  display: inline-block;
+  margin: 2px 4px 0 0;
+  padding: 0 6px;
+  font-size: 18px;
+  color: var(--white);
+  background: var(--title-end);
+}
+
+/* An app that draws its own edge-to-edge content inside the window adds `flush`
+   to the body (win.body.classList.add('flush')). The frame and title bar stay. */
+.window-body.flush { padding: 0; overflow: hidden; }
+
+/* ---------- About: a monochrome amber "phosphor" profile page ---------- */
+.about {
+  --ph: #ffb340; /* phosphor amber: every color on this page is a shade of it */
+  --ph-bright: #ffe3b0;
+  --ph-dim: rgba(255, 179, 64, 0.6);
+  --ph-faint: rgba(255, 179, 64, 0.22);
+  --ph-bg: #130e07;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  color: var(--ph);
+  background: radial-gradient(ellipse at 50% 35%, #2a1d0c 0%, var(--ph-bg) 70%);
+  text-shadow: 0 0 6px rgba(255, 179, 64, 0.35); /* phosphor glow */
+}
+.about button { background: none; border: 0; color: inherit; cursor: pointer; text-shadow: inherit; }
+.about-dim { color: var(--ph-dim); }
+
+.about-bar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  height: 34px;
+  padding: 0 22px;
+  font-size: 19px;
+  border-bottom: 1px solid var(--ph-faint);
+}
+
+/* Sizes below use cqw (1% of this box's width), so the page scales with the
+   window: normal size or maximized. */
+.about-scroll { position: relative; flex: 1; overflow: auto; scrollbar-color: var(--ph-faint) transparent; container-type: inline-size; }
+
+.about-hero { position: relative; height: 100%; min-height: 440px; overflow: hidden; }
+/* Full height, behind the name: the name sits over the lower face, like a title over a poster. */
+.about-portrait { position: absolute; top: 10px; left: 0; width: 100%; height: calc(100% - 10px); color: var(--ph); }
+
+/* The menu sits over the left edge of the portrait (the face stays centered). */
+.about-menu {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 24px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: clamp(24px, 3cqw, 32px);
+}
+.about-menu button { padding: 0; font: inherit; line-height: 1; }
+.about-menu .about-num { font-size: 0.7em; }
+.about-menu button:hover { color: var(--ph-bright); text-decoration: underline; text-underline-offset: 4px; }
+
+
+.about-num { color: #ff7a2f; font-size: 24px; }
+.about-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px; /* low, over the collar, so the face above stays clear */
+  padding: 18px 0;
+  text-align: center;
+  pointer-events: none;
+  /* A light dark haze, just enough for the name; the portrait still shows through. */
+  background: radial-gradient(ellipse 46% 55% at 50% 55%, rgba(19, 14, 7, 0.5) 30%, transparent 100%);
+}
+.about .about-tagline {
+  display: inline-block;
+  padding: 1px 12px;
+  margin-bottom: 6px;
+  font-size: clamp(16px, 2cqw, 20px);
+  letter-spacing: clamp(2px, 0.6cqw, 6px);
+  background: rgba(19, 14, 7, 0.9); /* reads over the portrait's letters */
+}
+.about .about-name {
+  font-size: clamp(56px, 10cqw, 100px); /* smaller, so the face above stays visible */
+  line-height: 0.85;
+  font-weight: normal;
+  letter-spacing: 1cqw;
+  color: var(--ph-bright);
+  text-shadow: 0 0 12px rgba(255, 179, 64, 0.6), 4px 4px 0 #3a250c;
+  margin: 0;
+}
+
+.about-section { max-width: 640px; margin: 0 auto; padding: 40px 24px; border-top: 1px dashed var(--ph-faint); }
+.about .about-crumbline { font-size: 18px; color: var(--ph-dim); margin-bottom: 6px; }
+.about .about-headline { font-size: clamp(44px, 6.4cqw, 64px); line-height: 0.95; font-weight: normal; color: var(--ph-bright); margin: 0 0 8px; }
+.about .about-meta { font-size: 19px; letter-spacing: 3px; margin-bottom: 14px; }
+.about .about-text { font-size: 23px; line-height: 1.25; margin-bottom: 16px; }
+.about .about-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.about-tags span { padding: 1px 8px; font-size: 18px; border: 1px solid var(--ph-dim); }
+
+.about .about-status { list-style: none; margin: 0; font-size: 22px; }
+.about-status li { display: flex; gap: 10px; }
+.about-status .about-dots { flex: 1; display: flex; gap: 8px; }
+.about-status .about-dots::after { content: ''; flex: 1; border-bottom: 2px dotted var(--ph-faint); margin-bottom: 6px; }
+.about-status .warn .about-mark { color: #ff7a2f; }
+/* Each index row links to its section. */
+.about-status button { width: 100%; display: flex; gap: 10px; padding: 0; font: inherit; text-align: left; }
+.about-status button:hover .about-index-link { color: var(--ph-bright); text-decoration: underline; text-underline-offset: 4px; }
+
+.about .about-text a { color: var(--ph-bright); text-underline-offset: 3px; }
+.about .about-text a:hover { color: var(--ph-bg); background: var(--ph); text-shadow: none; }
+
+/* "Continue reading": long text shows its first few lines until expanded. */
+.about-more { margin-bottom: 16px; }
+.about-more .about-text { margin-bottom: 4px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; }
+.about-more.open .about-text { display: block; }
+.about .about-more-btn { padding: 0; font: inherit; font-size: 19px; color: var(--ph-dim); }
+.about .about-more-btn:hover { color: var(--ph-bright); }
+
+.about .about-quote { margin: 0 0 14px; padding-left: 14px; border-left: 3px solid #ff7a2f; font-size: 26px; line-height: 1.2; color: var(--ph-bright); }
+
+.about-entry + .about-entry { margin-top: 30px; }
+.about .about-role { font-size: clamp(28px, 3.6cqw, 34px); line-height: 1; font-weight: normal; color: var(--ph-bright); margin: 0 0 4px; }
+
+.about .about-compact { list-style: none; margin: 0; font-size: 22px; }
+.about-compact li + li { margin-top: 12px; }
+.about .about-compact p { margin: 0; }
+.about-compact li p:first-child { display: flex; justify-content: space-between; gap: 16px; }
+.about-compact b { font-weight: normal; color: var(--ph-bright); }
+
+/* Projects: a sideways row of sticky notes. */
+.about-slider { display: flex; align-items: center; gap: 8px; }
+.about .about-slide { flex: none; padding: 4px; font-size: 22px; color: var(--ph-dim); }
+.about .about-slide:hover { color: var(--ph-bright); }
+.about-notes {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+  padding: 14px 6px 18px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-color: var(--ph-faint) transparent;
+}
+.about-note {
+  flex: none;
+  width: 220px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 14px 12px;
+  scroll-snap-align: start;
+  color: var(--ph-bg);
+  background: var(--ph);
+  text-decoration: none;
+  text-shadow: none;
+  box-shadow: 4px 4px 0 #3a250c;
+  transform: rotate(-1.5deg);
+  transition: transform 0.15s;
+}
+.about-note:nth-child(even) { transform: rotate(1.5deg); background: var(--ph-bright); }
+.about-note:hover { transform: rotate(0) translateY(-3px); }
+.about-note { position: relative; }
+.about-note[hidden] { display: none; }
+.about-note-claude { position: absolute; top: -10px; right: -10px; width: 30px; height: 30px; padding: 3px; color: #ff7a2f; background: var(--ph-bg); border-radius: 50%; }
+.about-note-title { font-size: 24px; line-height: 1; }
+.about-note-blurb { flex: 1; font-size: 18px; line-height: 1.15; }
+.about-note-tags { font-size: 16px; opacity: 0.75; }
+.about-note-open { align-self: flex-end; font-size: 18px; }
+a.about-note:hover { color: var(--ph-bg); }
+
+.about .about-writings { list-style: none; margin: 0; }
+.about-writings li + li { margin-top: 18px; }
+.about .about-writing-title { font-size: 26px; color: var(--ph-bright); margin-bottom: 4px; }
+.about-writing-title a { color: inherit; text-underline-offset: 4px; }
+
+.about-photo { margin: 0 0 16px; }
+.about-photo img { display: block; width: 100%; border: 1px solid var(--ph-dim); filter: sepia(0.35); }
+.about-photo figcaption { font-size: 17px; color: var(--ph-dim); margin-top: 4px; }
+
+.about .about-links { display: flex; flex-wrap: wrap; gap: 12px; }
+.about-entry .about-links { margin-top: 12px; }
+.about-link {
+  padding: 4px 16px;
+  color: var(--ph-bg);
+  background: var(--ph);
+  text-decoration: none;
+  text-shadow: none;
+}
+.about-link:hover { color: var(--ph-bg); background: var(--ph-bright); }
+.about ::selection { background: var(--ph); color: var(--ph-bg); }
+
+/* Projects */
+.project { padding: 10px 0; border-bottom: 1px solid #cfccc4; }
+.project:last-child { border-bottom: 0; }
+.project h2 { margin-top: 0; }
+
+/* Credits */
+.credits dt { color: var(--accent); margin-top: 12px; }
+.credits dd { margin-left: 18px; }
+.credits small { display: block; font-size: 17px; color: #5c5c5c; }
+
+/* Word game */
+.wordgame { display: flex; flex-direction: column; gap: 12px; height: 100%; }
+.wg-stats { display: flex; justify-content: space-between; }
+.wg-stats b { color: var(--accent); font-weight: normal; }
+.wg-time.low b { color: var(--red); }
+.wg-rack { display: flex; gap: 8px; justify-content: center; min-height: 64px; }
+.tile {
+  position: relative;
+  width: 54px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  font-size: 40px;
+  color: #3b2b12;
+  background: var(--yellow);
+  box-shadow: 3px 3px 0 #000;
+}
+.tile sub { position: absolute; right: 4px; bottom: 0; font-size: 19px; }
+.tile.used { opacity: 0.25; }
+.wg-input {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 30px;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  background: var(--white);
+  color: var(--black);
+  border: 2px solid;
+  border-color: var(--bevel-shadow) var(--bevel-light) var(--bevel-light) var(--bevel-shadow);
+  box-shadow: inset 1px 1px 0 var(--bevel-dark);
+  outline: none;
+}
+.wg-input:focus { background: #fffef8; }
+.wg-input:disabled { opacity: 0.5; }
+.wg-controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.wg-message { min-height: 1.2em; text-align: center; }
+.wg-message.good { color: var(--green); }
+.wg-message.bad { color: var(--red); }
+.wg-words { flex: 1; overflow: auto; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 4px 12px; font-size: 20px; }
+
+/* Snake */
+.snake { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.snake canvas { touch-action: none; image-rendering: pixelated; border: 2px solid; border-color: var(--bevel-shadow) var(--bevel-light) var(--bevel-light) var(--bevel-shadow); background: var(--black); max-width: 100%; }
+.snake-stats { width: 100%; display: flex; justify-content: space-between; }
+.snake-stats b { color: var(--accent); font-weight: normal; }
+
+/* ---------- CRT overlay ---------- */
+.crt {
+  position: absolute;
+  inset: 0;
+  z-index: 1000000;
+  pointer-events: none; /* never block clicks */
+  background:
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, transparent 72%, rgba(0, 0, 0, 0.15) 100%);
+  animation: flicker 0.12s infinite;
+}
+@keyframes flicker {
+  0% { opacity: 0.94; }
+  50% { opacity: 1; }
+  100% { opacity: 0.97; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crt { animation: none; }
+  #boot-text::after { animation: none; }
+}
+
+/* Narrow screens: smaller text and icons. */
+@media (max-width: 700px) {
+  :root { font-size: 20px; }
+  .icon { width: 88px; }
+}
+
+/* ---------- The pre/post-Claude switch (os/apps/era-switch.js) ----------
+   --heat (0..1, the knob's speed) and each tick's --lit are set from JS. */
+.era {
+  --heat: 0;
+  display: grid;
+  grid-template-columns: auto minmax(120px, 190px) auto;
+  align-items: center;
+  justify-content: start;
+  gap: 4px 16px;
+  margin: 4px 0 6px;
+  user-select: none;
+}
+.about .era-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  font: inherit;
+  font-size: 20px;
+  letter-spacing: 1px;
+  color: var(--ph-dim);
+  transition: color 0.3s, text-shadow 0.3s;
+}
+.about .era-label:hover { color: var(--ph); }
+.about .era-label[aria-pressed='true'] { color: var(--ph-bright); text-shadow: 0 0 6px var(--ph), 0 0 16px rgba(255, 122, 47, 0.55); }
+
+.era-spark { width: 18px; height: 18px; color: var(--ph-faint); transition: color 0.3s, filter 0.3s; }
+.era-label[aria-pressed='true'] .era-spark {
+  color: #ff7a2f;
+  filter: drop-shadow(0 0 4px #ff7a2f) drop-shadow(0 0 10px rgba(255, 179, 64, 0.7));
+  animation: era-ignite 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.4);
+}
+@keyframes era-ignite {
+  0% { transform: rotate(-120deg) scale(0.4); }
+  60% { transform: rotate(20deg) scale(1.25); }
+  100% { transform: rotate(0) scale(1); }
+}
+
+.era-track {
+  position: relative;
+  height: 26px;
+  background: #0b0804;
+  border: 1px solid var(--ph-faint);
+  box-shadow: inset 0 3px 6px #000, 0 0 calc(var(--heat) * 14px) rgba(255, 179, 64, calc(var(--heat) * 0.35));
+  touch-action: none; /* the knob drags sideways, the page shouldn't scroll */
+  cursor: pointer;
+}
+/* The glass: fine vents, plus the sweep of light when the stop changes. */
+.era-glass {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: repeating-linear-gradient(90deg, rgba(255, 179, 64, 0.07) 0 1px, transparent 1px 6px);
+}
+.era-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 60%;
+  background: linear-gradient(90deg, transparent, rgba(255, 227, 176, 0.35), transparent);
+  transform: translateX(-120%);
+}
+.sweep-right .era-glass::after { animation: era-sweep-right 0.55s ease-out; }
+.sweep-left .era-glass::after { animation: era-sweep-left 0.55s ease-out; }
+@keyframes era-sweep-right { from { transform: translateX(-120%); } to { transform: translateX(220%); } }
+@keyframes era-sweep-left { from { transform: translateX(220%); } to { transform: translateX(-120%); } }
+
+/* The charge bar, from the center to the knob. */
+.era-fill {
+  position: absolute;
+  top: 50%;
+  height: 4px;
+  transform: translateY(-50%);
+  background: linear-gradient(90deg, var(--ph), var(--ph-bright), var(--ph));
+  box-shadow: 0 0 6px var(--ph), 0 0 14px rgba(255, 122, 47, 0.6);
+}
+
+/* An LED under each stop, lit as the knob nears it. */
+.era-tick {
+  --lit: 0;
+  position: absolute;
+  bottom: -9px;
+  width: 8px;
+  height: 3px;
+  margin-left: -4px;
+  background: var(--ph);
+  opacity: calc(0.18 + var(--lit) * 0.82);
+  box-shadow: 0 0 calc(var(--lit) * 8px) var(--ph);
+}
+/* The end LEDs sit under the knob's center, not the track's edge. */
+.era-tick[data-stop='0'] { margin-left: calc(22px - 4px); }
+.era-tick[data-stop='2'] { margin-left: calc(-22px - 4px); }
+.era-tick.flash { animation: era-flash 0.5s ease-out; }
+@keyframes era-flash {
+  0% { background: #fff4dc; box-shadow: 0 0 6px #fff, 0 0 18px var(--ph), 0 0 30px #ff7a2f; }
+  100% { background: var(--ph); }
+}
+
+.era-fx { position: absolute; inset: -30px; width: calc(100% + 60px); height: calc(100% + 60px); pointer-events: none; }
+
+/* The knob: a lit key cap with googly eyes. */
+.era-knob {
+  position: absolute;
+  top: -5px;
+  left: 0;
+  width: 44px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: linear-gradient(180deg, #ffd58a 0%, #e89a32 55%, #9a5d17 100%);
+  border: 1px solid #ffe3b0;
+  box-shadow:
+    0 3px 0 #3a250c,
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 0 calc(6px + var(--heat) * 24px) rgba(255, 179, 64, calc(0.35 + var(--heat) * 0.55));
+  cursor: grab;
+  will-change: transform;
+  outline: none;
+}
+.era-eye {
+  position: relative;
+  width: 17px;
+  height: 17px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff 0%, #fff4dc 55%, #e9cfa2 100%);
+  box-shadow: 0 0 0 1px #3a250c, inset 0 -2px 2px rgba(58, 37, 12, 0.35), 0 1px 0 rgba(255, 255, 255, 0.4);
+  transform-origin: center;
+}
+.era-pupil {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #130e07;
+  box-shadow: inset 1px 1px 0 rgba(255, 244, 220, 0.85); /* the glint */
+}
+/* Blink: the eyes close and open. */
+.era-knob.blink .era-eye { animation: era-blink 0.16s ease-in-out; }
+@keyframes era-blink { 50% { transform: scaleY(0.1); } }
+/* Squint on a hit (> <): the eye shrinks to a chevron. */
+.era-knob[data-face='squint'] .era-eye,
+.era-knob[data-face='dizzy'] .era-eye { background: none; box-shadow: none; }
+.era-knob[data-face='squint'] .era-pupil { display: none; }
+.era-knob[data-face='squint'] .era-eye::before {
+  content: '>';
+  font-size: 20px;
+  line-height: 1;
+  color: #130e07;
+  text-shadow: none;
+}
+.era-knob[data-face='squint'] .era-eye + .era-eye::before { content: '<'; }
+/* Dizzy on a hard hit: the eyes become spinning spirals. */
+.era-knob[data-face='dizzy'] .era-pupil {
+  width: 14px;
+  height: 14px;
+  translate: 0 0 !important; /* the spiral spins in place, wherever the pupil was */
+  background: repeating-conic-gradient(from 0deg, #130e07 0 30deg, #fff4dc 30deg 60deg);
+  mask: radial-gradient(circle, #000 0 2px, transparent 2px 3px, #000 3px 5px, transparent 5px 6px, #000 6px);
+  box-shadow: none;
+  animation: era-dizzy 0.5s linear infinite;
+}
+.era-knob[data-face='dizzy'] .era-eye + .era-eye .era-pupil { animation-direction: reverse; }
+@keyframes era-dizzy { to { transform: rotate(360deg); } }
+.era-knob:focus-visible { outline: 1px dashed var(--ph-bright); outline-offset: 4px; }
+.era.dragging .era-knob, .era.dragging .era-track { cursor: grabbing; }
+
+.about .era-readout { grid-column: 1 / -1; min-height: 1.2em; margin: 8px 0 0; font-size: 17px; color: var(--ph-dim); white-space: pre; }

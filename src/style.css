@@ -1,0 +1,114 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  /* Must match the fog color in Environment.js, so the desk fades into the page. */
+  --bg: #0d0c14;
+  --c64-blue: #40318d;
+  --c64-light: #7869c4;
+  --text: #c9c3f5;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 40%, #1a1830 0%, var(--bg) 70%);
+  color: var(--text);
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+}
+
+/* Both render layers fill the viewport and sit exactly on top of each other. */
+#css-root, #webgl {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* `clip` (not `hidden`) also blocks programmatic scrolling, which focus() on the
+   iframe could otherwise trigger and throw the CSS3D layer out of alignment. */
+#css-root { overflow: clip; }
+
+/* The magic: the canvas is on top but lets every click fall through to the iframe. */
+#webgl { pointer-events: none; }
+
+/* ---------- loading overlay ---------- */
+#loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  transition: opacity 0.8s ease;
+}
+#loader.done { opacity: 0; pointer-events: none; }
+[hidden] { display: none !important; }
+
+.loader-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 32px;
+  text-align: center;
+}
+.loader-box h1 { font-size: 40px; letter-spacing: 12px; color: #fff; }
+.loader-sub { font-size: 12px; letter-spacing: 3px; opacity: 0.7; }
+
+.loader-bar {
+  width: 260px;
+  height: 10px;
+  border: 2px solid var(--c64-light);
+}
+.loader-fill {
+  width: 0%;
+  height: 100%;
+  background: var(--c64-light);
+  transition: width 0.2s linear;
+}
+.loader-status { font-size: 12px; letter-spacing: 2px; }
+
+.loader-start {
+  margin-top: 8px;
+  padding: 12px 24px;
+  font: inherit;
+  font-size: 16px;
+  letter-spacing: 3px;
+  color: #fff;
+  text-decoration: none;
+  background: var(--c64-blue);
+  border: 2px solid var(--c64-light);
+  cursor: pointer;
+  animation: pulse 1.2s steps(2) infinite;
+}
+.loader-start:hover { background: var(--c64-light); }
+
+@keyframes pulse { 50% { border-color: #fff; } }
+
+/* ---------- HUD ---------- */
+#hud {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 5;
+  display: flex;
+  gap: 8px;
+}
+#hud button {
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--text);
+  text-decoration: none;
+  background: rgba(13, 12, 20, 0.7);
+  border: 1px solid var(--c64-light);
+  cursor: pointer;
+}
+#hud button:hover { background: var(--c64-blue); }
+
+@media (prefers-reduced-motion: reduce) {
+  .loader-start { animation: none; }
+  #loader { transition: none; }
+}

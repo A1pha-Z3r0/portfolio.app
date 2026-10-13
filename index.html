@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Jonathan: computational biology, bioinformatics, and interpretability." />
+    <link rel="icon" href="/favicon.svg" />
+    <title>Jonathan</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <!-- Bottom layer: CSS3DRenderer. The iframe showing /os/ lives in here. -->
+    <div id="css-root"></div>
+    <!-- Top layer: WebGLRenderer. Transparent + pointer-events: none, so clicks reach the iframe. -->
+    <canvas id="webgl"></canvas>
+
+    <!-- Loading overlay (driven by Loader.js) -->
+    <div id="loader">
+      <div class="loader-box">
+        <h1>JONATHAN</h1>
+        <p class="loader-sub">COMPUTATIONAL BIOLOGY · INTERPRETABILITY</p>
+        <div class="loader-bar"><div class="loader-fill"></div></div>
+        <p class="loader-status">LOADING 0%</p>
+        <button class="loader-start" hidden>CLICK TO START</button>
+      </div>
+    </div>
+
+    <!-- Small HUD, shown after start -->
+    <div id="hud" hidden>
+      <button id="mute-toggle" aria-pressed="false" title="Mute">SOUND: ON</button>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

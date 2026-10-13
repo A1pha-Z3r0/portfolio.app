@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+
+# Henry Heffernan's repos, cloned for reading only
+reference/
+
+# Original Sketchfab download (a working copy lives in public/models/c64/)
+commodore_64__computer_full_pack/
+commodore_64__computer_full_pack.zip
+
+# Personal files that stay on this machine (raw photos, notes)
+private/
