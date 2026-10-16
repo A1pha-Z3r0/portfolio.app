@@ -136,7 +136,7 @@ const WRITINGS = []
 const LINKS = [
   { label: 'GITHUB', href: 'https://github.com/A1pha-Z3r0' },
   { label: 'EMAIL', href: 'mailto:jonathanallwinraj@gmail.com' },
-  { label: 'RESUME (PDF)', href: '/resume/Resume.pdf' },
+  { label: 'CV (PDF)', href: '/resume/Resume.pdf' },
 ]
 
 const pad = (n) => String(n).padStart(2, '0')

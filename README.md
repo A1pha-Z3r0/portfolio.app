@@ -16,7 +16,7 @@ npm run preview   # serve dist/ locally
 
 | What | File |
 | --- | --- |
-| About page: name, tagline, intro, sections (origin, experience, education, writings), links | the constants at the top of `os/apps/about.js` (CV goes at `public/cv.pdf`) |
+| About page: name, tagline, intro, sections (origin, experience, education, writings), links | the constants at the top of `os/apps/about.js` (CV is at `public/resume/Resume.pdf`) |
 | Papers / PDFs linked from the site | `public/papers/` |
 | About portrait photo | `PORTRAIT` in `os/apps/about.js` (photo in `public/images/`; drawn in A/C/G/T letters by `os/apps/dna-portrait.js`) |
 | Projects (Projects app + the About page's sticky notes) | the `PROJECTS` array in `os/apps/projects.js` (`claude: true` = built with Claude) |
