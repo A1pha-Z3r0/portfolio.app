@@ -481,9 +481,36 @@ a.about-note:hover { color: var(--ph-bg); }
 .about ::selection { background: var(--ph); color: var(--ph-bg); }
 
 /* Projects */
-.project { padding: 10px 0; border-bottom: 1px solid #cfccc4; }
+.project {
+  display: block;
+  width: 100%;
+  padding: 10px 8px;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid #cfccc4;
+  cursor: pointer;
+}
 .project:last-child { border-bottom: 0; }
-.project h2 { margin-top: 0; }
+.project:hover, .project:focus-visible { background: #e8e5dc; outline: none; }
+.project:hover h2 { text-decoration: underline; text-underline-offset: 4px; }
+.project p { margin-bottom: 6px; }
+.project-meta { font-size: 18px; }
+.project-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.project-head h2 { margin: 0; }
+.project-status { padding: 0 6px; font-size: 16px; color: var(--accent); border: 1px solid var(--accent); }
+.project-back { margin-bottom: 10px; padding: 0; background: none; border: 0; color: var(--link); cursor: pointer; }
+.project-back:hover { color: var(--title); text-decoration: underline; }
+.project-detail .project-head h2 { font-size: 32px; }
+.project-detail > .muted { margin-top: 4px; }
+.project-section h3 { margin: 16px 0 6px; font-size: 22px; font-weight: normal; color: var(--black); border-bottom: 1px dashed var(--bevel-shadow); }
+.project-section ol, .project-section ul { margin: 0 0 6px 26px; }
+.project-section li + li { margin-top: 3px; }
+.project-decision b { font-weight: normal; color: var(--accent); }
+.project-decision p { margin-bottom: 8px; }
+.project-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+.project-link { padding: 2px 12px; color: var(--white); background: var(--title); text-decoration: none; }
+.project-link:hover { color: var(--white); background: var(--title-end); }
 
 /* Credits */
 .credits dt { color: var(--accent); margin-top: 12px; }
