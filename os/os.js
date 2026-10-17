@@ -2,12 +2,13 @@ import { createWindow, getWindow, onWindowsChange, toggleFromTaskbar } from './w
 import { icon } from './icons.js'
 import about from './apps/about.js'
 import projects from './apps/projects.js'
+import cv from './apps/cv.js'
 import wordgame from './apps/wordgame.js'
 import snake from './apps/snake.js'
 import credits from './apps/credits.js'
 
 // Each app: { id, title, icon, width, height, create(win) => HTMLElement }
-const APPS = [about, projects, wordgame, snake, credits]
+const APPS = [about, cv, projects, wordgame, snake, credits]
 
 const $ = (sel) => document.querySelector(sel)
 const embedded = window.parent !== window

@@ -512,6 +512,21 @@ a.about-note:hover { color: var(--ph-bg); }
 .project-link { padding: 2px 12px; color: var(--white); background: var(--title); text-decoration: none; }
 .project-link:hover { color: var(--white); background: var(--title-end); }
 
+/* CV: a toolbar over the PDF, edge to edge. */
+.cv { display: flex; flex-direction: column; height: 100%; }
+.cv-bar { display: flex; justify-content: flex-end; gap: 8px; padding: 4px 6px; background: var(--face); border-bottom: 1px solid var(--bevel-shadow); }
+.cv-button {
+  padding: 1px 12px;
+  color: var(--text);
+  text-decoration: none;
+  background: var(--face);
+  border: 2px solid;
+  border-color: var(--bevel-light) var(--bevel-dark) var(--bevel-dark) var(--bevel-light);
+}
+.cv-button:hover { color: var(--text); background: #e4e1da; }
+.cv-button:active { border-color: var(--bevel-dark) var(--bevel-light) var(--bevel-light) var(--bevel-dark); }
+.cv-pdf { flex: 1; width: 100%; border: 0; background: var(--white); }
+
 /* Credits */
 .credits dt { color: var(--accent); margin-top: 12px; }
 .credits dd { margin-left: 18px; }
