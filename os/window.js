@@ -85,7 +85,9 @@ export function createWindow({ id = crypto.randomUUID(), title, content, width =
   const bounds = layer.getBoundingClientRect()
   el.style.width = `${Math.min(width, bounds.width - 8)}px`
   el.style.height = `${Math.min(height, bounds.height - 8)}px`
-  if (maximized) win.toggleMaximize()
+  // On phones every window fills the screen (os.css hides the maximize button).
+  const phone = document.documentElement.classList.contains('phone')
+  if (maximized || phone) win.toggleMaximize()
   body.append(typeof content === 'function' ? content(win) : content)
   layer.append(el)
   windows.set(id, win)
@@ -99,7 +101,7 @@ export function createWindow({ id = crypto.randomUUID(), title, content, width =
   maxButton.addEventListener('click', () => win.toggleMaximize())
   el.querySelector('[data-action="close"]').addEventListener('click', () => win.close())
   const titlebar = el.querySelector('.titlebar')
-  titlebar.addEventListener('dblclick', (e) => !e.target.closest('button') && win.toggleMaximize())
+  if (!phone) titlebar.addEventListener('dblclick', (e) => !e.target.closest('button') && win.toggleMaximize())
   makeDraggable(el, titlebar)
 
   focusWindow(win)

@@ -6,6 +6,11 @@ import Loader from './Loader.js'
 import Computer from './Computer.js'
 import Screen from './Screen.js'
 import Audio from './Audio.js'
+import PhoneOS from './PhoneOS.js'
+
+// Phones get the full-size overlay OS (PhoneOS.js). Tablets are big enough for the
+// screen in the scene, so they behave like laptops (tap the screen instead of hovering).
+const isPhone = () => matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) < 600
 
 // The hub. Every module gets a reference to this object and reads what it needs
 // from it (scenes, sizes, camera, gui). Same idea as Henry's Application.ts,
@@ -15,6 +20,8 @@ export default class Experience {
     this.canvas = canvas
     this.cssRoot = cssRoot
     this.gui = gui // null unless ?debug
+    this.phone = isPhone()
+    this.touch = matchMedia('(pointer: coarse)').matches
 
     // Two scenes, one camera. WebGL objects go in `scene`, the iframe goes in `cssScene`.
     this.scene = new THREE.Scene()
@@ -31,17 +38,21 @@ export default class Experience {
     this.loader = new Loader(this)
     this.screen = new Screen(this)
     this.computer = new Computer(this)
+    if (this.phone) this.phoneOS = new PhoneOS(this)
 
     addEventListener('resize', () => this.resize())
     this.renderer.instance.setAnimationLoop((t) => this.tick(t))
   }
 
-  // Called by Loader when the visitor clicks "CLICK TO START".
+  // Called by Loader when the visitor clicks "CLICK TO START" ("TAP" on touch screens).
   start() {
     this.started = true
     this.audio.unlock()
     this.camera.goTo('desk', 1.6)
-    setTimeout(() => this.screen.powerOn(), 600) // boot the OS while the camera flies in
+    setTimeout(() => {
+      this.screen.powerOn() // boot the OS while the camera flies in
+      this.phoneOS?.powerOn()
+    }, 600)
     document.querySelector('#hud').hidden = false
   }
 

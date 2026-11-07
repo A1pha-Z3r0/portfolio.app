@@ -574,7 +574,7 @@ a.about-note:hover { color: var(--ph-bg); }
 
 /* Snake */
 .snake { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.snake canvas { touch-action: none; image-rendering: pixelated; border: 2px solid; border-color: var(--bevel-shadow) var(--bevel-light) var(--bevel-light) var(--bevel-shadow); background: var(--black); max-width: 100%; }
+.snake canvas { height: auto; touch-action: none; image-rendering: pixelated; border: 2px solid; border-color: var(--bevel-shadow) var(--bevel-light) var(--bevel-light) var(--bevel-shadow); background: var(--black); max-width: 100%; }
 .snake-stats { width: 100%; display: flex; justify-content: space-between; }
 .snake-stats b { color: var(--accent); font-weight: normal; }
 
@@ -776,3 +776,35 @@ a.about-note:hover { color: var(--ph-bg); }
 .era.dragging .era-knob, .era.dragging .era-track { cursor: grabbing; }
 
 .about .era-readout { grid-column: 1 / -1; min-height: 1.2em; margin: 8px 0 0; font-size: 17px; color: var(--ph-dim); white-space: pre; }
+
+/* ---------- Phone: the full-size copy of the OS (/os/?phone, see src/world/PhoneOS.js) ----------
+   Every window opens maximized (window.js), so no dragging; bigger tap targets throughout. */
+.phone { --taskbar: 52px; }
+.phone #icons {
+  inset: 16px 10px auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 14px 4px;
+  justify-items: center;
+}
+.phone .icon { width: 84px; }
+.phone .icon svg { width: 52px; height: 52px; }
+.phone .icon span { font-size: 19px; }
+
+.phone .titlebar { height: 40px; cursor: default; }
+.phone .win-btn { width: 34px; height: 30px; }
+.phone .win-btn[data-action="maximize"] { display: none; }
+.phone .window-body { padding: 12px; }
+.phone .window-body.flush { padding: 0; }
+
+.phone #taskbar { padding: 0 8px; gap: 6px; }
+.phone #taskbar button { height: 38px; padding: 0 10px; }
+.phone #tasks { overflow-x: auto; scrollbar-width: none; }
+.phone #tasks button { flex: none; max-width: 140px; }
+.phone #clock { display: none; }
+.phone #desk { flex: none; }
+
+.phone #start-menu { left: 0; right: 0; min-width: 0; }
+.phone #start-menu button { padding: 12px 16px; }
+/* Landscape phones are short: shrink the board to fit under the title bar and taskbar. */
+.phone .snake canvas { width: auto; max-height: calc(100vh - 200px); }

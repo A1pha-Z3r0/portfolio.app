@@ -100,6 +100,22 @@ export default class Screen {
   }
 
   listen() {
+    // Phones: this copy is just the picture on the monitor; PhoneOS.js takes the taps.
+    if (this.experience.phone) {
+      this.iframe.style.pointerEvents = 'none'
+      return
+    }
+
+    // Tablets have no hover: a tap on the screen zooms in (the OS reports it as a
+    // pointerdown, below), and a tap anywhere else zooms out.
+    if (this.experience.touch) {
+      addEventListener('pointerdown', (e) => {
+        if (e.target.closest('#hud, #loader')) return
+        this.hovering = false
+        this.leave()
+      })
+    }
+
     // Hover to zoom in, leave to zoom out.
     this.wrapper.addEventListener('mouseenter', () => {
       this.hovering = true
@@ -120,6 +136,10 @@ export default class Screen {
       const { type } = e.data
       const audio = this.experience.audio
       if (type === 'pointerdown') {
+        if (this.experience.touch && !this.hovering) {
+          this.hovering = true
+          this.enter()
+        }
         this.held = true
         audio.mouseDown()
       }

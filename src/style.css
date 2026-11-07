@@ -28,6 +28,8 @@ html, body {
 /* `clip` (not `hidden`) also blocks programmatic scrolling, which focus() on the
    iframe could otherwise trigger and throw the CSS3D layer out of alignment. */
 #css-root { overflow: clip; }
+/* Drags pan the view (Camera.js parallax) instead of scrolling or pinch-zooming the page. */
+#css-root { touch-action: none; }
 
 /* The magic: the canvas is on top but lets every click fall through to the iframe. */
 #webgl { pointer-events: none; }
@@ -108,7 +110,40 @@ html, body {
 }
 #hud button:hover { background: var(--c64-blue); }
 
+/* ---------- phones (src/world/PhoneOS.js) ---------- */
+#tap-hint {
+  position: fixed;
+  left: 50%;
+  bottom: calc(64px + env(safe-area-inset-bottom));
+  z-index: 5;
+  transform: translateX(-50%);
+  padding: 8px 14px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  white-space: nowrap;
+  color: #fff;
+  background: rgba(13, 12, 20, 0.7);
+  border: 2px solid var(--c64-light);
+  pointer-events: none;
+  animation: pulse 1.2s steps(2) infinite;
+}
+
+/* The full-size OS. Fades over the scene once the camera has zoomed into the monitor.
+   Padded by the safe areas so the OS stays clear of the notch and the home bar. */
+#phone-os {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background: #000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0s 0.25s;
+}
+#phone-os.open { opacity: 1; visibility: visible; transition: opacity 0.35s ease; }
+#phone-os iframe { display: block; width: 100%; height: 100%; border: 0; }
+
 @media (prefers-reduced-motion: reduce) {
-  .loader-start { animation: none; }
-  #loader { transition: none; }
+  .loader-start, #tap-hint { animation: none; }
+  #loader, #phone-os { transition: none; }
 }

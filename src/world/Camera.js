@@ -64,7 +64,7 @@ export default class Camera {
     // Desk: further back and a bit above, looking slightly down at the keyboard.
     // On tall/narrow windows back off further (like Henry's aspect term in DeskKeyframe).
     const portrait = Math.max(0, 1 / this.instance.aspect - 0.6)
-    const deskDist = width * (3.4 + 2.2 * portrait)
+    const deskDist = width * (3.4 + 3.2 * portrait)
     this.views.desk.position.copy(center).addScaledVector(normal, deskDist).addScaledVector(up, height * 0.9)
     this.views.desk.target.copy(center).addScaledVector(up, -height * 0.55)
 

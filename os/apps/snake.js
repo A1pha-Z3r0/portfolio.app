@@ -15,6 +15,7 @@ const DIRS = {
 }
 
 let best = 0 // kept in memory for this visit
+const touch = matchMedia('(pointer: coarse)').matches
 
 export default {
   id: 'snake',
@@ -28,7 +29,7 @@ export default {
     el.innerHTML = `
       <div class="snake-stats"><span>SCORE <b class="sn-score">0</b></span><span>BEST <b class="sn-best">${best}</b></span></div>
       <canvas width="${GRID * CELL}" height="${GRID * CELL}" aria-label="Snake game"></canvas>
-      <p class="muted">ARROWS / WASD (OR SWIPE) · SPACE PAUSE</p>`
+      <p class="muted">${touch ? 'SWIPE TO TURN · TAP TO PAUSE' : 'ARROWS / WASD (OR SWIPE) · SPACE PAUSE'}</p>`
     const canvas = el.querySelector('canvas')
     const ctx = canvas.getContext('2d')
 
@@ -106,9 +107,9 @@ export default {
       })
 
       const message = {
-        ready: ['SNAKE', 'PRESS SPACE OR AN ARROW'],
-        paused: ['PAUSED', 'PRESS SPACE TO RESUME'],
-        over: ['GAME OVER', `SCORE ${game.score} · SPACE TO RETRY`],
+        ready: ['SNAKE', touch ? 'TAP OR SWIPE TO START' : 'PRESS SPACE OR AN ARROW'],
+        paused: ['PAUSED', touch ? 'TAP TO RESUME' : 'PRESS SPACE TO RESUME'],
+        over: ['GAME OVER', `SCORE ${game.score} · ${touch ? 'TAP' : 'SPACE'} TO RETRY`],
       }[game.state]
       if (message) {
         ctx.fillStyle = 'rgba(0,0,0,0.6)'

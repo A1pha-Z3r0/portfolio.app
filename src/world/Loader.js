@@ -11,6 +11,7 @@ export default class Loader {
     const fill = root.querySelector('.loader-fill')
     const status = root.querySelector('.loader-status')
     const button = root.querySelector('.loader-start')
+    if (experience.touch) button.textContent = 'TAP TO START'
 
     this.manager = new THREE.LoadingManager()
     this.manager.onProgress = (_url, loaded, total) => {

@@ -13,6 +13,10 @@ const APPS = [about, cv, projects, wordgame, snake, credits]
 const $ = (sel) => document.querySelector(sel)
 const embedded = window.parent !== window
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
+// The full-size copy the 3D page lays over the scene on phones (src/world/PhoneOS.js).
+// os.css and window.js key their phone layout off this class.
+const phone = new URLSearchParams(location.search).has('phone')
+document.documentElement.classList.toggle('phone', phone)
 
 // ---------------------------------------------------------------------------
 // Bridge to the 3D page. Events inside an iframe never reach the parent, so we
@@ -183,6 +187,15 @@ restart.addEventListener('click', () => {
   boot()
 })
 menu.append(restart)
+
+// Phones: a way back out to the 3D desk, in place of the clock.
+if (phone) {
+  const desk = document.createElement('button')
+  desk.id = 'desk'
+  desk.textContent = '◄ DESK'
+  desk.addEventListener('click', () => post('exit'))
+  $('#taskbar').append(desk)
+}
 
 // Clock
 function tickClock() {
